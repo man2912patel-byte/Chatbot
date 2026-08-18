@@ -92,18 +92,6 @@ python chatbot.py
 
 ---
 
-## 📖 Future Improvements
-
-- Add Date & Time
-- Add Calculator
-- Add Jokes
-- Add Weather API
-- Voice Assistant
-- GUI using Tkinter
-- AI Model Integration
-
----
-
 ## 👨‍💻 Author
 
 **Man Patel**
