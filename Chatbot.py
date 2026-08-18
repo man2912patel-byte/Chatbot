@@ -2,7 +2,7 @@ print("🤖 Welcome to AI ChatBot")
 print("Type 'exit' to quit.\n")
 
 responses = {
-    "hello": "Hi there! 👋",
+    "HELLO": "Hi there! 👋",
     "hi": "Hello! 😊",
     "how are you": "I'm doing great! Thanks for asking.",
     "what is your name": "My name is DecodeBot.",
