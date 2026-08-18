@@ -1,4 +1,4 @@
-# 🤖 Rule-Based AI ChatBot
+#🤖 Rule-Based AI ChatBot
 
 ## 📌 Project Overview
 
