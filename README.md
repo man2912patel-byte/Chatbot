@@ -2,43 +2,57 @@ import SwiftUI
 
 struct ContentView: View {
     
-    // Player
-    @State private var playerX: CGFloat = 100
-    @State private var playerY: CGFloat = 500
+    // MARK: - Player
     
-    // Jump
+    @State private var playerX: CGFloat = 80
+    @State private var playerY: CGFloat = 520
+    
     @State private var isJumping = false
     
-    // Game
+    
+    // MARK: - Coin
+    
+    @State private var coinX: CGFloat = 250
+    @State private var coinY: CGFloat = 520
+    @State private var coinVisible = true
+    
+    
+    // MARK: - Game
+    
     @State private var score = 0
-    @State private var gameOver = false
+    
     
     var body: some View {
         
         ZStack {
             
-            // Background
+            // MARK: Background
+            
             LinearGradient(
-                colors: [.blue.opacity(0.3), .cyan.opacity(0.1)],
+                colors: [
+                    .cyan.opacity(0.4),
+                    .blue.opacity(0.15)
+                ],
                 startPoint: .top,
                 endPoint: .bottom
             )
             .ignoresSafeArea()
             
             
-            // Score
+            // MARK: Score
+            
             VStack {
+                
                 HStack {
                     
-                    Text("⭐ \(score)")
+                    Text("⭐ Score: \(score)")
                         .font(.title3)
-                        .bold()
+                        .fontWeight(.bold)
                     
                     Spacer()
                     
                     Text("Mini Game")
                         .font(.headline)
-                    
                 }
                 .padding()
                 
@@ -46,43 +60,54 @@ struct ContentView: View {
             }
             
             
-            // Cloud
+            // MARK: Clouds
+            
             Text("☁️")
-                .font(.system(size: 60))
+                .font(.system(size: 55))
                 .position(x: 80, y: 130)
             
-            
-            // Second Cloud
             Text("☁️")
-                .font(.system(size: 50))
-                .position(x: 320, y: 180)
+                .font(.system(size: 45))
+                .position(x: 320, y: 170)
             
             
-            // Platform
+            // MARK: Platform
+            
             Rectangle()
                 .fill(.brown)
-                .frame(width: 140, height: 20)
+                .frame(width: 150, height: 20)
                 .position(x: 250, y: 430)
             
             
-            // Coin
-            Button {
-                score += 1
-            } label: {
+            // MARK: Coin
+            
+            if coinVisible {
+                
                 Text("🪙")
                     .font(.system(size: 40))
+                    .position(
+                        x: coinX,
+                        y: coinY
+                    )
             }
-            .position(x: 250, y: 380)
             
             
-            // Ground
+            // MARK: Ground
+            
             Rectangle()
                 .fill(.green)
-                .frame(height: 80)
-                .position(x: 200, y: 750)
+                .frame(
+                    width: 400,
+                    height: 80
+                )
+                .position(
+                    x: 200,
+                    y: 750
+                )
             
             
-            // Player
+            // MARK: Player
+            
             Text("🧑")
                 .font(.system(size: 50))
                 .position(
@@ -91,7 +116,8 @@ struct ContentView: View {
                 )
             
             
-            // Controls
+            // MARK: Controls
+            
             VStack {
                 
                 Spacer()
@@ -99,42 +125,66 @@ struct ContentView: View {
                 HStack(spacing: 15) {
                     
                     // LEFT
+                    
                     Button {
                         moveLeft()
                     } label: {
+                        
                         Text("⬅️")
                             .font(.system(size: 30))
-                            .frame(width: 65, height: 55)
+                            .frame(
+                                width: 65,
+                                height: 55
+                            )
                             .background(.white)
                             .cornerRadius(15)
                     }
                     
                     
                     // JUMP
+                    
                     Button {
                         jump()
                     } label: {
+                        
                         Text("⬆️")
                             .font(.system(size: 30))
-                            .frame(width: 65, height: 55)
+                            .frame(
+                                width: 65,
+                                height: 55
+                            )
                             .background(.white)
                             .cornerRadius(15)
                     }
                     
                     
                     // RIGHT
+                    
                     Button {
                         moveRight()
                     } label: {
+                        
                         Text("➡️")
                             .font(.system(size: 30))
-                            .frame(width: 65, height: 55)
+                            .frame(
+                                width: 65,
+                                height: 55
+                            )
                             .background(.white)
                             .cornerRadius(15)
                     }
                 }
                 
-                .padding(.bottom, 20)
+                
+                // RESET
+                
+                Button("Reset Game") {
+                    resetGame()
+                }
+                .padding(.top, 10)
+                .foregroundStyle(.red)
+                
+                .padding(.bottom, 15)
             }
         }
     }
@@ -148,9 +198,13 @@ struct ContentView: View {
             playerX -= 30
         }
         
+        // Screen boundary
+        
         if playerX < 30 {
             playerX = 30
         }
+        
+        checkCoin()
     }
     
     
@@ -162,9 +216,13 @@ struct ContentView: View {
             playerX += 30
         }
         
+        // Screen boundary
+        
         if playerX > 370 {
             playerX = 370
         }
+        
+        checkCoin()
     }
     
     
@@ -172,26 +230,74 @@ struct ContentView: View {
     
     func jump() {
         
+        // Already jumping?
+        
         if isJumping {
             return
         }
         
         isJumping = true
         
-        // Go up
+        
+        // Player goes UP
+        
         withAnimation(.easeOut(duration: 0.3)) {
             playerY = 350
         }
         
-        // Come down
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        // Player comes DOWN
+        
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + 0.3
+        ) {
             
             withAnimation(.easeIn(duration: 0.3)) {
-                playerY = 500
+                playerY = 520
             }
             
             isJumping = false
+            
+            checkCoin()
         }
+    }
+    
+    
+    // MARK: - Coin Collision
+    
+    func checkCoin() {
+        
+        // Check distance between player and coin
+        
+        let xDistance = abs(playerX - coinX)
+        let yDistance = abs(playerY - coinY)
+        
+        if xDistance < 50 && yDistance < 50 {
+            
+            if coinVisible {
+                
+                score += 1
+                
+                coinVisible = false
+            }
+        }
+    }
+    
+    
+    // MARK: - Reset
+    
+    func resetGame() {
+        
+        playerX = 80
+        playerY = 520
+        
+        coinX = 250
+        coinY = 520
+        
+        coinVisible = true
+        
+        score = 0
+        
+        isJumping = false
     }
 }
 
