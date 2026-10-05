@@ -1,107 +1,95 @@
-## Rule-Based AI ChatBot
+import SwiftUI
 
-## 📌 Project Overview
+struct ContentView: View {
+    
+    @State private var maths = ""
+    @State private var physics = ""
+    @State private var chemistry = ""
+    
+    @State private var total = 0
+    @State private var percentage = 0.0
+    @State private var grade = ""
+    
+    var body: some View {
+        
+        VStack(spacing: 20) {
+            
+            Image(systemName: "graduationcap.fill")
+                .font(.system(size: 60))
+                .foregroundStyle(.blue)
+            
+            Text("Student Grade Calculator")
+                .font(.title2)
+                .fontWeight(.bold)
+            
+            TextField("Maths Marks", text: $maths)
+                .textFieldStyle(.roundedBorder)
+                .keyboardType(.numberPad)
+            
+            TextField("Physics Marks", text: $physics)
+                .textFieldStyle(.roundedBorder)
+                .keyboardType(.numberPad)
+            
+            TextField("Chemistry Marks", text: $chemistry)
+                .textFieldStyle(.roundedBorder)
+                .keyboardType(.numberPad)
+            
+            Button("Calculate") {
+                calculateResult()
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(.blue)
+            .foregroundStyle(.white)
+            .cornerRadius(10)
+            
+            Text("Total Marks: \(total) / 300")
+            
+            Text("Percentage: \(percentage, specifier: "%.2f")%")
+            
+            Text("Grade: \(grade)")
+                .font(.title3)
+                .fontWeight(.bold)
+            
+            Button("Reset") {
+                maths = ""
+                physics = ""
+                chemistry = ""
+                total = 0
+                percentage = 0
+                grade = ""
+            }
+            .foregroundStyle(.red)
+        }
+        .padding()
+    }
+    
+    func calculateResult() {
+        
+        let m = Int(maths) ?? 0
+        let p = Int(physics) ?? 0
+        let c = Int(chemistry) ?? 0
+        
+        total = m + p + c
+        
+        percentage = Double(total) / 300 * 100
+        
+        if percentage >= 90 {
+            grade = "A+"
+        } else if percentage >= 80 {
+            grade = "A"
+        } else if percentage >= 70 {
+            grade = "B"
+        } else if percentage >= 60 {
+            grade = "C"
+        } else if percentage >= 50 {
+            grade = "D"
+        } else {
+            grade = "F"
+        }
+    }
+}
 
-This project is a simple Rule-Based AI ChatBot developed in Python as part of the DecodeLabs Artificial Intelligence Industrial Training Program (Project 1).
-
-The chatbot interacts with users by recognizing predefined commands and responding with appropriate messages using a Python dictionary and control flow logic.
-
----
-
-## 🎯 Objective
-
-- Build a basic AI chatbot using Python.
-- Understand rule-based decision making.
-- Learn input handling, loops, dictionaries, and conditional logic.
-
----
-
-## ✨ Features
-
-- 👋 Responds to greetings
-- 😊 Answers basic questions
-- 🙏 Handles thank you messages
-- 👋 Exits when user types **exit**
-- ❓ Responds to unknown input with a default message
-- 🔁 Runs continuously until the user exits
-
----
-
-## 🛠️ Technologies Used
-
-- Python 3
-- Dictionary (Hash Map)
-- While Loop
-- User Input
-- Control Flow Logic
-
----
-
-## 💬 Example
-
-```
-🤖 Welcome to AI ChatBot
-
-You: hello
-Bot: Hi there! 👋
-
-You: how are you
-Bot: I'm doing great! Thanks for asking.
-
-You: thanks
-Bot: You're welcome! 😊
-
-You: exit
-Bot: Goodbye! 👋
-```
-
----
-
-## 📂 Project Structure
-
-```
-Rule-Based-AI-ChatBot/
-│── chatbot.py
-│── README.md
-```
-
----
-
-## 🚀 How to Run
-
-1. Install Python 3.
-2. Download or clone this project.
-3. Open Terminal or Command Prompt.
-4. Run:
-
-```bash
-python chatbot.py
-```
-
----
-
-## 📚 Concepts Used
-
-- Variables
-- Input & Output
-- While Loop
-- Dictionary
-- String Methods
-- Rule-Based AI
-- Decision Making
-
----
-
-## 👨‍💻 Author
-
-**Man Patel**
-
-B.Tech CSE Student  
-Parul University  
-DecodeLabs AI Industrial Training – Project 1
-
----
-
-## ⭐ Thank You
-
-This project was created for learning the fundamentals of Artificial Intelligence through hands-on practice using Python.
+#Preview {
+    ContentView()
+}
