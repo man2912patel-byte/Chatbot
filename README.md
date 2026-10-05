@@ -2,305 +2,117 @@ import SwiftUI
 
 struct ContentView: View {
     
-    // MARK: - Player
-    
-    @State private var playerX: CGFloat = 80
-    @State private var playerY: CGFloat = 520
-    
-    @State private var isJumping = false
-    
-    
-    // MARK: - Coin
-    
-    @State private var coinX: CGFloat = 250
-    @State private var coinY: CGFloat = 520
-    @State private var coinVisible = true
-    
-    
-    // MARK: - Game
-    
+    @State private var playerX = 0
     @State private var score = 0
-    
+    @State private var coinVisible = true
+    @State private var jumping = false
     
     var body: some View {
         
-        ZStack {
+        VStack {
             
-            // MARK: Background
-            
-            LinearGradient(
-                colors: [
-                    .cyan.opacity(0.4),
-                    .blue.opacity(0.15)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
-            
-            // MARK: Score
-            
-            VStack {
+            // Score
+            HStack {
+                Text("⭐ Score: \(score)")
+                    .font(.title3)
+                    .bold()
                 
-                HStack {
+                Spacer()
+                
+                Text("Mini Game")
+                    .bold()
+            }
+            .padding()
+            
+            // Game Area
+            ZStack {
+                
+                Color.cyan.opacity(0.2)
+                
+                VStack {
                     
-                    Text("⭐ Score: \(score)")
-                        .font(.title3)
-                        .fontWeight(.bold)
+                    Text("☁️")
+                        .font(.system(size: 50))
                     
                     Spacer()
                     
-                    Text("Mini Game")
-                        .font(.headline)
-                }
-                .padding()
-                
-                Spacer()
-            }
-            
-            
-            // MARK: Clouds
-            
-            Text("☁️")
-                .font(.system(size: 55))
-                .position(x: 80, y: 130)
-            
-            Text("☁️")
-                .font(.system(size: 45))
-                .position(x: 320, y: 170)
-            
-            
-            // MARK: Platform
-            
-            Rectangle()
-                .fill(.brown)
-                .frame(width: 150, height: 20)
-                .position(x: 250, y: 430)
-            
-            
-            // MARK: Coin
-            
-            if coinVisible {
-                
-                Text("🪙")
-                    .font(.system(size: 40))
-                    .position(
-                        x: coinX,
-                        y: coinY
-                    )
-            }
-            
-            
-            // MARK: Ground
-            
-            Rectangle()
-                .fill(.green)
-                .frame(
-                    width: 400,
-                    height: 80
-                )
-                .position(
-                    x: 200,
-                    y: 750
-                )
-            
-            
-            // MARK: Player
-            
-            Text("🧑")
-                .font(.system(size: 50))
-                .position(
-                    x: playerX,
-                    y: playerY
-                )
-            
-            
-            // MARK: Controls
-            
-            VStack {
-                
-                Spacer()
-                
-                HStack(spacing: 15) {
-                    
-                    // LEFT
-                    
-                    Button {
-                        moveLeft()
-                    } label: {
-                        
-                        Text("⬅️")
-                            .font(.system(size: 30))
-                            .frame(
-                                width: 65,
-                                height: 55
-                            )
-                            .background(.white)
-                            .cornerRadius(15)
+                    // Coin
+                    if coinVisible {
+                        Text("🪙")
+                            .font(.system(size: 40))
                     }
                     
+                    Spacer()
                     
-                    // JUMP
+                    // Player
+                    Text("🧑")
+                        .font(.system(size: 50))
+                        .offset(
+                            x: CGFloat(playerX),
+                            y: jumping ? -100 : 0
+                        )
                     
-                    Button {
-                        jump()
-                    } label: {
+                    // Ground
+                    Rectangle()
+                        .fill(.green)
+                        .frame(height: 50)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            
+            
+            // Controls
+            HStack(spacing: 15) {
+                
+                Button("⬅️") {
+                    playerX -= 30
+                }
+                .font(.largeTitle)
+                
+                
+                Button("⬆️") {
+                    
+                    if !jumping {
                         
-                        Text("⬆️")
-                            .font(.system(size: 30))
-                            .frame(
-                                width: 65,
-                                height: 55
-                            )
-                            .background(.white)
-                            .cornerRadius(15)
-                    }
-                    
-                    
-                    // RIGHT
-                    
-                    Button {
-                        moveRight()
-                    } label: {
+                        jumping = true
                         
-                        Text("➡️")
-                            .font(.system(size: 30))
-                            .frame(
-                                width: 65,
-                                height: 55
-                            )
-                            .background(.white)
-                            .cornerRadius(15)
+                        DispatchQueue.main.asyncAfter(
+                            deadline: .now() + 0.5
+                        ) {
+                            jumping = false
+                        }
                     }
                 }
+                .font(.largeTitle)
                 
                 
-                // RESET
-                
-                Button("Reset Game") {
-                    resetGame()
+                Button("➡️") {
+                    
+                    playerX += 30
+                    
+                    // Coin collection
+                    if playerX >= 180 && coinVisible {
+                        score += 1
+                        coinVisible = false
+                    }
                 }
-                .padding(.top, 10)
-                .foregroundStyle(.red)
-                
-                .padding(.bottom, 15)
+                .font(.largeTitle)
             }
-        }
-    }
-    
-    
-    // MARK: - Move Left
-    
-    func moveLeft() {
-        
-        withAnimation {
-            playerX -= 30
-        }
-        
-        // Screen boundary
-        
-        if playerX < 30 {
-            playerX = 30
-        }
-        
-        checkCoin()
-    }
-    
-    
-    // MARK: - Move Right
-    
-    func moveRight() {
-        
-        withAnimation {
-            playerX += 30
-        }
-        
-        // Screen boundary
-        
-        if playerX > 370 {
-            playerX = 370
-        }
-        
-        checkCoin()
-    }
-    
-    
-    // MARK: - Jump
-    
-    func jump() {
-        
-        // Already jumping?
-        
-        if isJumping {
-            return
-        }
-        
-        isJumping = true
-        
-        
-        // Player goes UP
-        
-        withAnimation(.easeOut(duration: 0.3)) {
-            playerY = 350
-        }
-        
-        // Player comes DOWN
-        
-        DispatchQueue.main.asyncAfter(
-            deadline: .now() + 0.3
-        ) {
+            .padding()
             
-            withAnimation(.easeIn(duration: 0.3)) {
-                playerY = 520
+            
+            // Reset
+            Button("Reset Game") {
+                playerX = 0
+                score = 0
+                coinVisible = true
+                jumping = false
             }
-            
-            isJumping = false
-            
-            checkCoin()
+            .foregroundStyle(.red)
+            .padding(.bottom)
         }
-    }
-    
-    
-    // MARK: - Coin Collision
-    
-    func checkCoin() {
-        
-        // Check distance between player and coin
-        
-        let xDistance = abs(playerX - coinX)
-        let yDistance = abs(playerY - coinY)
-        
-        if xDistance < 50 && yDistance < 50 {
-            
-            if coinVisible {
-                
-                score += 1
-                
-                coinVisible = false
-            }
-        }
-    }
-    
-    
-    // MARK: - Reset
-    
-    func resetGame() {
-        
-        playerX = 80
-        playerY = 520
-        
-        coinX = 250
-        coinY = 520
-        
-        coinVisible = true
-        
-        score = 0
-        
-        isJumping = false
     }
 }
-
 
 #Preview {
     ContentView()
